@@ -1,0 +1,56 @@
+[tool.poetry]
+name = "fitnessstat"
+version = "0.1.0"
+description = "FitnessStat API"
+authors = ["ItSoda <nikitashchegilskiy@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+django = "4.2"
+djangorestframework = "^3.14.0"
+drf-yasg = "^1.21.7"
+djoser = "^2.2.2"
+pillow = "^10.1.0"
+django-debug-toolbar = "^4.2.0"
+django-environ = "0.10.0"
+django-extensions = "3.2.3"
+django-redis = "5.3.0"
+redis = "4.6.0"
+celery = {extras = ["redis"], version = "^5.3.6"}
+yookassa = "2.4.0"
+drf-extensions = "0.7.1"
+gunicorn = "^21.2.0"
+django-cors-headers = "^4.3.1"
+channels-redis = "^4.1.0"
+djangochannelsrestframework = "^1.2.0"
+python-decouple = "^3.8"
+phonenumbers = "^8.13.28"
+django-phonenumber-field = "^7.3.0"
+twilio = "^8.11.1"
+boto3 = "^1.34.38"
+django-otp = "^1.3.0"
+channels = {version = "^4.0.0", extras = ["uvicorn"] }
+psycopg2-binary = "^2.9.9"
+django-tinymce = "^3.7.1"
+django-colorfield = "^0.11.0"
+fake-useragent = "^1.5.1"
+urlextract = "^1.9.0"
+django-ratelimit = "^4.1.0"
+django-dbbackup = "^4.1.0"
+user-agents = "^2.2.0"
+setuptools = "^69.2.0"
+uvicorn = { version = "^0.29.0", extras = ["standard"] }
+aiogram = "^3.4.1"
+asyncio = "^3.4.3"
+
+
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "5.0.4"
+isort = "5.10.1"
+black = "23.10.1"
+coverage = "7.3.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

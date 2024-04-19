@@ -1,0 +1,83 @@
+version: '2'
+
+services:
+  postgresql:
+    image: postgres
+    restart: always
+    container_name: ${POSTGRESQL_HOST}
+    env_file:
+      - .env.docker
+    environment:
+      POSTGRES_DB: ${POSTGRESQL_DATABASE}
+      POSTGRES_USER: ${POSTGRESQL_ROOT_USER}
+      POSTGRES_PASSWORD: ${POSTGRESQL_ROOT_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  redis: 
+    image: redis:latest
+    container_name: redis-fitnessstat
+    restart: always
+    ports:
+      - "6379:6379"
+
+  api:
+    build: .
+    image: fitnessstat:latest
+    restart: always
+    command:
+      - sh
+      - -c
+      - |
+        dockerize -wait tcp://postgresql:5432 -timeout 300s &&
+        poetry run python manage.py collectstatic --noinput &&
+        poetry run python manage.py migrate &&
+        poetry run uvicorn FitnessStat.asgi:application --port 8000 --host 0.0.0.0 --workers 24  
+    environment:
+      - DOCKER_CONTAINER=True
+      - VIRTUAL_HOST=fitness-stat.ru
+      - LETSENCRYPT_HOST=fitness-stat.ru
+    depends_on:
+      - postgresql
+      - redis
+    volumes:
+      - .:/fitnessstat
+      - static_volume:/fitnessstat/static
+      - media_volume:/fitnessstat/media
+    container_name: django-api
+
+  nginx:
+    build: 
+      dockerfile: ./Dockerfile
+      context: ./docker/nginx/
+    container_name: nginx_fitnessstat
+    image: nginx_fitnessstat
+    volumes:
+      - static_volume:/fitnessstat/static
+      - media_volume:/fitnessstat/media
+      - certs:/etc/nginx/certs
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+      - "443:443"
+  acme_companion:
+    image: nginxproxy/acme-companion:2.2
+    container_name: solevar_acme_companion
+    volumes_from:
+      - nginx
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - acme:/etc/acme.sh
+
+volumes:
+  db-data: null
+  static_volume:
+  media_volume:
+  certs:
+  vhost:
+  html:
+  acme:
