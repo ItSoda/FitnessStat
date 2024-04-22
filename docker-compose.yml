@@ -6,7 +6,7 @@ services:
     restart: always
     container_name: ${POSTGRESQL_HOST}
     env_file:
-      - .env.docker
+      - ${ENV_FILE}
     environment:
       POSTGRES_DB: ${POSTGRESQL_DATABASE}
       POSTGRES_USER: ${POSTGRESQL_ROOT_USER}
