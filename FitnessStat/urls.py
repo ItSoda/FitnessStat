@@ -7,7 +7,12 @@ from rest_framework_simplejwt.views import TokenVerifyView
 from .admin import custom_admin_site
 from djoser.views import UserViewSet
 from .yasg import urlpatterns as doc_url
-from users.views import CustomTokenRefreshView, LogoutAPIView, SignInTGNotifyAPIView, UserProfileRetrieveAPI
+from users.views import (
+    CustomTokenRefreshView,
+    LogoutAPIView,
+    SignInTGNotifyAPIView,
+    UserProfileRetrieveAPI,
+)
 
 
 urlpatterns = [

@@ -260,12 +260,12 @@ SIMPLE_JWT = {
 }
 
 
-# # CSRF
-# CSRF_TRUSTED_ORIGINS = str(config("CORS_AND_CSRF_DOMAINS")).split(",")
+# CSRF
+CSRF_TRUSTED_ORIGINS = str(config("CORS_AND_CSRF_DOMAINS")).split(",")
 
 
-# # CORS
-# CORS_ALLOWED_ORIGINS = ["localhost"]
+# CORS
+CORS_ALLOWED_ORIGINS = str(config("CORS_AND_CSRF_DOMAINS")).split(",")
 
 
 CORS_ALLOW_METHODS = [

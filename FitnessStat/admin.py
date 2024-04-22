@@ -22,10 +22,13 @@ class UserCustomAdmin(admin.ModelAdmin):
         "photo",
         "phone_number",
         "email",
-        "first_name",
-        "last_name",
-        "patronymic",
+        "name",
+        "login",
+        "age",
+        "city",
         "description",
+        "experience",
+        "role",
         "date_joined",
         "last_login",
         "is_verified_email",
@@ -37,12 +40,11 @@ class UserCustomAdmin(admin.ModelAdmin):
         "id",
         "phone_number",
         "email",
-        "first_name",
-        "last_name",
-        "patronymic",
+        "name",
     )
     filter_horizontal = ("groups",)
-    search_fields = ["phone_number", "email", "patronymic"]
+    search_fields = ["phone_number", "email", "name"]
+
 
 custom_admin_site.register(User, UserCustomAdmin)
 custom_admin_site.register(Group)

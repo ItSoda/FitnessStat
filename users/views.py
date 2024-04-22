@@ -4,16 +4,20 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import (TokenObtainPairView,
-                                            TokenRefreshView)
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django_ratelimit.decorators import ratelimit
 
-from .serializers import UserProfileSerializer, UserProfileUpdateSerializer, UserShortSerializer
+from .serializers import (
+    UserProfileSerializer,
+    UserProfileUpdateSerializer,
+    UserShortSerializer,
+)
 
 logger_error = logging.getLogger("error")
 logger = logging.getLogger("main")
+
 
 class CustomTokenRefreshView(TokenRefreshView):
     """Запрос для refresh access токена с отключением логирования"""
@@ -24,7 +28,7 @@ class CustomTokenRefreshView(TokenRefreshView):
         response = super().post(request, *args, **kwargs)
         logger.disabled = False
         return response
-    
+
 
 class UserProfileRetrieveAPI(RetrieveAPIView):
     """Запрос полной информации о пользователе"""
@@ -33,11 +37,11 @@ class UserProfileRetrieveAPI(RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
-    
+
     @method_decorator(ratelimit(key="ip", rate="5/s"))
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
-    
+
 
 class LogoutAPIView(APIView):
     """Запрос на выход из аккаунта"""
@@ -82,7 +86,8 @@ class UserProfileUpdateAPIView(APIView):
                 {"error": "Неправильный формат данных"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
+
 class SignInTGNotifyAPIView(TokenObtainPairView):
     """Авторизация"""
 

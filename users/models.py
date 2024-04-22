@@ -10,11 +10,21 @@ from users.managers import CustomUserManager
 class User(AbstractUser):
     """Модель пользователя"""
 
+    CLIENT = "client"
+    COACH = "coach"
+
+    ROLES_CHOICES = (
+        (COACH, "coach"),
+        (CLIENT, "client"),
+    )
+
+    login = models.CharField(max_length=128)
+    name = models.CharField(max_length=128)
+    age = models.PositiveIntegerField(default=0)
+    city = models.CharField(max_length=32)
+    description = models.TextField()
     phone_number = PhoneNumberField(unique=True)
     email = models.EmailField(blank=True)
-    first_name = models.CharField(max_length=50, default="Имя")
-    last_name = models.CharField(max_length=50, default="Фамилия")
-    patronymic = models.CharField(max_length=50, default="Отчество", blank=True, null=True)
     is_verified_email = models.BooleanField(default=False)
     description = models.TextField(blank=True, null=True)
     photo = models.ImageField(
@@ -23,6 +33,8 @@ class User(AbstractUser):
         blank=True,
         default="avatars/no_profile.png",
     )
+    experience = models.PositiveIntegerField(default=0)
+    role = models.CharField(max_length=6, choices=ROLES_CHOICES, default=CLIENT)
 
     username = None
 

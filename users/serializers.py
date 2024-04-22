@@ -18,7 +18,7 @@ logger_error = logging.getLogger("error")
 
 class UserRegistSerializer(UserCreateSerializer):
     """Сериализатор регистрации пользователей"""
-    
+
     class Meta(UserCreateSerializer.Meta):
         fields = ("id", "phone_number", "password")
 
@@ -32,8 +32,7 @@ class UserShortSerializer(serializers.ModelSerializer):
             "id",
             "phone_number",
             "email",
-            "first_name",
-            "last_name",
+            "name",
         )
 
 
@@ -49,7 +48,7 @@ class UserProfileSerializer(UserShortSerializer):
             "description",
             "date_joined",
             "last_login",
-            "photo"
+            "photo",
         )
         read_only_fields = ("password",)
 
@@ -62,10 +61,8 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            "first_name",
-            "last_name",
-            "patronymic",
-            "description"
+            "name",
+            "description",
             "photo",
         ]
         extra_kwargs = {
@@ -96,4 +93,3 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
                 logger.info(f"Ошибка: {str(e)}")
                 raise ValueError("Неправильный формат фотографии")
         return super().update(instance, validated_data)
-
