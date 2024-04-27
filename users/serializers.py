@@ -20,7 +20,7 @@ class UserRegistSerializer(UserCreateSerializer):
     """Сериализатор регистрации пользователей"""
 
     class Meta(UserCreateSerializer.Meta):
-        fields = ("id", "phone_number", "password")
+        fields = ("id", "phone_number", "password", "email")
 
 
 class UserShortSerializer(serializers.ModelSerializer):
@@ -66,9 +66,7 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
             "photo",
         ]
         extra_kwargs = {
-            "first_name": {"required": False},
-            "last_name": {"required": False},
-            "patronymic": {"required": False},
+            "name": {"required": False},
             "photo": {"required": False},
             "description": {"required": False},
         }

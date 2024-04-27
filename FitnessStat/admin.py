@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from tinymce.widgets import TinyMCE
 
-from users.models import User
+from users.models import User, EmailVerifications, PhoneNumberVerifySMS
 
 
 class CustomAdminSite(admin.AdminSite):
@@ -15,6 +15,17 @@ class CustomAdminSite(admin.AdminSite):
 
 
 custom_admin_site = CustomAdminSite(name="admin_panel")
+
+
+class EmailVerificationsCustomAdmin(admin.TabularInline):
+    model = EmailVerifications
+    fields = ("code", "expiration")
+    extra = 0
+
+
+class PhoneNumberVerifySMSCustomAdmin(admin.ModelAdmin):
+    list_display = ("code", "phone_number", "expiration")
+    
 
 
 class UserCustomAdmin(admin.ModelAdmin):
@@ -44,7 +55,9 @@ class UserCustomAdmin(admin.ModelAdmin):
     )
     filter_horizontal = ("groups",)
     search_fields = ["phone_number", "email", "name"]
+    inlines = [EmailVerificationsCustomAdmin]
 
 
 custom_admin_site.register(User, UserCustomAdmin)
+custom_admin_site.register(PhoneNumberVerifySMS, PhoneNumberVerifySMSCustomAdmin)
 custom_admin_site.register(Group)

@@ -4,6 +4,7 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
 from users.managers import CustomUserManager
+from users.services import is_expired, send_verification_email, send_verification_phone
 
 
 # Модель пользователя
@@ -48,4 +49,44 @@ class User(AbstractUser):
         verbose_name_plural = "Клиенты | Тренеры"
 
     def __str__(self) -> str:
-        return f"{self.last_name} {self.first_name} {self.patronymic}"
+        return f"{self.name}"
+
+
+class PhoneNumberVerifySMS(models.Model):
+    """Модель для смс-кодов"""
+
+    code = models.CharField(unique=True, max_length=4)
+    phone_number = PhoneNumberField()
+    created = models.DateTimeField(auto_now_add=True)
+    expiration = models.DateTimeField()
+
+    class Meta:
+        verbose_name = "код подтверждения"
+        verbose_name_plural = "Коды подтверждения"
+
+    def __str__(self) -> str:
+        return f"СМС-код для {self.phone_number}"
+
+    def send_verification_phone(self):
+        send_verification_phone(self.phone_number, self.code)
+
+    def is_expired(self):
+        is_expired(self)
+
+
+class EmailVerifications(models.Model):
+    """Модель для верификации почты"""
+
+    code = models.UUIDField(unique=True, null=True, blank=True)
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    expiration = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Код для подтверждения почты {self.user.email}"
+
+    def send_verification_email(self):
+        send_verification_email(self.user.email, self.code)
+
+    def is_expired(self):
+        is_expired(self)

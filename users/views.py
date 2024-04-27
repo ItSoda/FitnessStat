@@ -9,6 +9,13 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django_ratelimit.decorators import ratelimit
 
+from users.models import User
+from users.services import (
+    proccess_email_verification,
+    proccess_phone_verification,
+    send_phone_verify_task,
+)
+
 from .serializers import (
     UserProfileSerializer,
     UserProfileUpdateSerializer,
@@ -88,18 +95,130 @@ class UserProfileUpdateAPIView(APIView):
             )
 
 
-class SignInTGNotifyAPIView(TokenObtainPairView):
-    """Авторизация"""
+class SignInAPIView(APIView):
+    """Запрос на авторизацию"""
+
+    def post(self, request):
+        phone_number = request.data.get("phone_number")
+
+        if not phone_number:
+            return Response(
+                {"error": "Номер телефона обязателен."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user = User.objects.filter(phone_number=phone_number).first()
+
+        if not user:
+            return Response(
+                {"error": "Пользователь не найден."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        refresh = RefreshToken.for_user(user)
+        return Response(
+            {
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+# PHONE NUMBER VIEWS
+class PhoneNumberVerificationView(APIView):
+    """Верификация СМС-кода"""
 
     def post(self, request, *args, **kwargs):
         try:
-            response = super().post(request, *args, **kwargs)
-            return response
-        except Exception as e:
-            logger_error.error(f"Ошибка авторизации: {str(e)}")
+            # Получаем данные
+            phone_number = request.data.get("phone_number")
+            code = request.data.get("code")
+
+            phone_verify_result = proccess_phone_verification(code, phone_number)
+
+            if phone_verify_result:
+                return Response(
+                    {"message": "СМС-код успешно подтвержден"}, status=status.HTTP_200_OK
+                )
             return Response(
-                {
-                    "error": "Неправильные учетные данные. Пожалуйста, проверьте ваш логин и пароль и попробуйте снова."
-                },
+                {"message": "СМС-код неправильный или просрочен"},
                 status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            logger_error.error(f"Ошибка верификации СМС-кода: {str(e)}")
+            return Response(
+                {"error": "Произошла ошибка"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class PhoneNumberSendSMSView(APIView):
+    """Отправка СМС-кода"""
+
+    def post(self, request, *args, **kwargs):
+        try:
+            # Получаем данные
+            phone_number = request.data.get("phone_number")
+
+            send_phone_verify_task(phone_number)
+            return Response(
+                {"message": "СМС-код успешно отправлен"}, status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            logger_error.error(f"Ошибка отправки смс-кода: {str(e)}")
+            return Response(
+                {"error": f"Произошла ошибка."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
+# EMAIL VIEWS
+class EmailVerificationUserUpdateView(APIView):
+    """Верификация почты и обновления у пользователя подтверждения почты"""
+
+    def get(self, request, *args, **kwargs):
+        # Получение данных
+        code = kwargs.get("code")
+        email = kwargs.get("email")
+
+        email_verify, user = proccess_email_verification(code=code, email=email)
+
+        try:
+            if email_verify:
+                return Response(
+                    {"is_verified_email": user.is_verified_email},
+                    status=status.HTTP_200_OK,
+                )
+            return Response(
+                {"error": "Код был просрочен или неправильный"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            logger_error.error(f"Ошибка верицикации почты {str(e)}")
+            return Response(
+                {"error": "Произошла ошибка"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class CheckEmailVerifyAPIView(APIView):
+    """Проверка верификации почты пользователя"""
+
+    def get(self, request, *args, **kwargs):
+        user = self.request.user
+
+        try:
+            # Если почта не подтверждена
+            if not user.is_verified_email:
+                return Response(
+                    {"message": "Почта не подтверждена."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            return Response(
+                {"is_verified_email": user.is_verified_email}, status=status.HTTP_200_OK
+            )
+
+        except Exception as e:
+            logger_error.error(f"Ошибка верификации почты пользователя {str(e)}")
+            return Response(
+                {"error": "Произошла ошибка."}, status=status.HTTP_400_BAD_REQUEST
             )

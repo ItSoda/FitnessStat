@@ -310,66 +310,31 @@ CHANNEL_LAYERS = {
 }
 
 
-# # CELERY
-# CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/0"
-# CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/0"
-# CELERY_ACCEPT_CONTENT = ["json"]
-# CELERY_TASK_SERIALIZER = "json"
-# CELERY_RESULT_SERIALIZER = "json"
-# CELERY_TIMEZONE = "Europe/Moscow"
-# CELERY_BEAT_SCHEDULE = {
-#     "check-list-transactions": {
-#         "task": "payments.tasks.check_list_transactions",
-#         "schedule": timezone.timedelta(seconds=30),
-#     },
-#     "check-price-bitcoin": {
-#         "task": "payments.tasks.check_price_bitcoin",
-#         "schedule": timezone.timedelta(minutes=30),
-#     },
-#     "monitoring-links": {
-#         "task": "management.tasks.tasks_monitoring_links",
-#         "schedule": timezone.timedelta(minutes=5),
-#     },
-#     "monitoring-currency": {
-#         "task": "marketplace.tasks.task_update_all_exchange_rates",
-#         "schedule": timezone.timedelta(minutes=20),
-#     },
-#     "monitoring-online": {
-#         "task": "users.tasks.task_check_online_user",
-#         "schedule": timezone.timedelta(seconds=15),
-#     },
-#     "notify_inactive_user": {
-#         "task": "tgbot.tasks.notify_inactive_users",
-#         "schedule": timezone.timedelta(minutes=5),
-#     },
-#     "monitoring_order": {
-#         "task": "chats.tasks.monitoring_order",
-#         "schedule": timezone.timedelta(hours=1),
-#     },
-#     "payment_queue": {
-#         "task": "payments.tasks.task_complete_payment_queue",
-#         "schedule": timezone.timedelta(minutes=5),
-#     },
-#     "bitcoin_price_percentage_change_monitoring": {
-#         "task": "payments.tasks.task_bitcoin_price_percentage_change_monitoring",
-#         "schedule": timezone.timedelta(minutes=3),
-#     },
-#     "backup_database": {
-#         "task": "users.tasks.backup_database",
-#         "schedule": timezone.timedelta(hours=6),
-#     },
-#     "check_user_blocked_status": {
-#         "task": "users.tasks.check_user_blocked_status",
-#         "schedule": timezone.timedelta(seconds=15),
-#     },
-#     "create_wallet_address": {
-#         "task": "payments.tasks.create_wallet",
-#         "schedule": timezone.timedelta(hours=6),
-#     },
-# }
+# CELERY
+CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/0"
+CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/0"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "Europe/Moscow"
+
 
 # RATELIMITS
 RATELIMIT_ENABLE = config.get("RATELIMIT_ENABLE")
 
 # MAX HTTP SIZE
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 33
+
+
+# EMAIL
+EMAIL_HOST = config.get("EMAIL_HOST")
+EMAIL_HOST_USER = config.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config.get("EMAIL_HOST_PASSWORD")
+EMAIL_USE_SSL = config.get("EMAIL_USE_SSL")
+EMAIL_PORT = config.get("EMAIL_PORT")
+DEFAULT_FROM_EMAIL = config.get("DEFAULT_FROM_EMAIL")
+
+
+# TWILIO
+ACCOUNT_SID_TWILIO = config.get("ACCOUNT_SID_TWILIO")
+AUTH_TOKEN_TWILIO = config.get("AUTH_TOKEN_TWILIO")
