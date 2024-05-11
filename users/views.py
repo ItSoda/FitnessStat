@@ -138,7 +138,8 @@ class PhoneNumberVerificationView(APIView):
 
             if phone_verify_result:
                 return Response(
-                    {"message": "СМС-код успешно подтвержден"}, status=status.HTTP_200_OK
+                    {"message": "СМС-код успешно подтвержден"},
+                    status=status.HTTP_200_OK,
                 )
             return Response(
                 {"message": "СМС-код неправильный или просрочен"},

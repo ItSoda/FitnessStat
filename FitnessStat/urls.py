@@ -18,6 +18,7 @@ from users.views import (
 urlpatterns = [
     path("admin_panel/", custom_admin_site.urls),
     path("users/", include("users.urls"), name="users"),
+    path("posts/", include("posts.urls"), name="posts"),
     path(
         "auth/registration/",
         UserViewSet.as_view({"post": "create"}),

@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from tinymce.widgets import TinyMCE
 
+from posts.models import ImagePost, Post
 from users.models import User, EmailVerifications, PhoneNumberVerifySMS
 
 
@@ -25,7 +26,6 @@ class EmailVerificationsCustomAdmin(admin.TabularInline):
 
 class PhoneNumberVerifySMSCustomAdmin(admin.ModelAdmin):
     list_display = ("code", "phone_number", "expiration")
-    
 
 
 class UserCustomAdmin(admin.ModelAdmin):
@@ -58,6 +58,25 @@ class UserCustomAdmin(admin.ModelAdmin):
     inlines = [EmailVerificationsCustomAdmin]
 
 
+class ImagePostCustomAdmin(admin.ModelAdmin):
+    """Кастомный класс админки для фотографий поста"""
+
+    list_display = ("id",)
+
+
+class PostCustomAdmin(admin.ModelAdmin):
+    """Кастомный класс админки для постов"""
+
+    list_display = (
+        "id",
+        "creator",
+        "title",
+    )
+    filter_horizontal = ("images",)
+
+
 custom_admin_site.register(User, UserCustomAdmin)
 custom_admin_site.register(PhoneNumberVerifySMS, PhoneNumberVerifySMSCustomAdmin)
 custom_admin_site.register(Group)
+custom_admin_site.register(ImagePost, ImagePostCustomAdmin)
+custom_admin_site.register(Post, PostCustomAdmin)
