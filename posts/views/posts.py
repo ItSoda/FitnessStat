@@ -36,10 +36,8 @@ class PostAllAPIView(APIView):
 
             return Response(
                 {
-                    "posts": {
-                        "count": posts.count(),
-                        "results": posts_serializer_data,
-                    },
+                    "count": posts.count(),
+                    "results": posts_serializer_data,
                 },
                 status=status.HTTP_200_OK,
             )
