@@ -11,6 +11,7 @@ from django_ratelimit.decorators import ratelimit
 
 from users.models import User
 from users.services import (
+    get_user_statistics_by_user,
     proccess_email_verification,
     proccess_phone_verification,
     send_phone_verify_task,
@@ -20,6 +21,7 @@ from .serializers import (
     UserProfileSerializer,
     UserProfileUpdateSerializer,
     UserShortSerializer,
+    UserStatisticSerializer,
 )
 
 logger_error = logging.getLogger("error")
@@ -167,7 +169,7 @@ class PhoneNumberSendSMSView(APIView):
         except Exception as e:
             logger_error.error(f"Ошибка отправки смс-кода: {str(e)}")
             return Response(
-                {"error": f"Произошла ошибка."},
+                {"error": "Произошла ошибка."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -222,4 +224,25 @@ class CheckEmailVerifyAPIView(APIView):
             logger_error.error(f"Ошибка верификации почты пользователя {str(e)}")
             return Response(
                 {"error": "Произошла ошибка."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class UserStatisticsInfoAPIView(APIView):
+    """Запрос для получения статистики пользователя"""
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            user_statistic = get_user_statistics_by_user(user=user)
+            user_statistic_serializer_data = UserStatisticSerializer(
+                user_statistic, context={"request": request}
+            ).data
+            return Response(
+                user_statistic_serializer_data, status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            logger_error.error(f"Ошибка вывода статистики пользователя: {str(e)}")
+            return Response(
+                {"error": "Не получилось вывести статистику пользователя."},
+                status=status.HTTP_400_BAD_REQUEST,
             )

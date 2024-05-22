@@ -6,7 +6,9 @@ from django.utils import timezone
 import logging
 import random
 from datetime import timedelta
-from django.core.mail import EmailMessage, send_mail
+from django.core.mail import send_mail
+
+from users.models import User, UserStatistic
 
 logger_error = logging.getLogger("error")
 
@@ -96,3 +98,7 @@ def proccess_email_verification(code: int, email: str) -> list:
     except Exception as e:
         logger_error.error(f"Ошибка подтверждения почты у пользователя: {str(e)}")
         return False, user
+
+
+def get_user_statistics_by_user(user: User) -> UserStatistic:
+    """Получение статистики пользователя с помощью пользователя"""

@@ -2,15 +2,18 @@ import base64
 import logging
 import uuid
 from io import BytesIO
-from typing import Optional
-
-from django.conf import settings
 from django.core.files.base import ContentFile, File
 from djoser.serializers import UserCreateSerializer
 from PIL import Image
 from rest_framework import serializers
 
-from .models import User
+from .models import (
+    BodyVolume,
+    ExternalIndicator,
+    PhysicalIndicator,
+    User,
+    UserStatistic,
+)
 
 logger = logging.getLogger("main")
 logger_error = logging.getLogger("error")
@@ -91,3 +94,62 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
                 logger.info(f"Ошибка: {str(e)}")
                 raise ValueError("Неправильный формат фотографии")
         return super().update(instance, validated_data)
+
+
+class ExternalIndicatorSerializer(serializers.ModelSerializer):
+    """Сериализатор для внешних показателей"""
+
+    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
+
+    class Meta:
+        model = ExternalIndicator
+        fields = (
+            "id",
+            "number_of_steps_per_day",
+            "amount_of_KCAL_per_day",
+            "proteins",
+            "fats",
+            "carbohydrates",
+            "created_at",
+        )
+
+
+class PhysicalIndicatorSerializer(serializers.ModelSerializer):
+    """Сериализатор для физических показателей"""
+
+    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
+
+    class Meta:
+        model = PhysicalIndicator
+        fields = ("id", "weight", "created_at")
+
+
+class BodyVolumeSerializer(serializers.ModelSerializer):
+    """Сериализатор для обьема тела"""
+
+    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
+
+    class Meta:
+        model = BodyVolume
+        fields = (
+            "id",
+            "bust",
+            "biceps",
+            "hip",
+            "calf",
+            "waist",
+            "forearm",
+            "created_at",
+        )
+
+
+class UserStatisticSerializer(serializers.ModelSerializer):
+    """Сериалиазатор для статистики пользователя"""
+
+    body_volumes = BodyVolumeSerializer(many=True)
+    physical_indicators = PhysicalIndicatorSerializer(many=True)
+    external_indicators = ExternalIndicatorSerializer(many=True)
+
+    class Meta:
+        model = UserStatistic
+        fields = ("id", "body_volumes", "physical_indicators", "external_indicators")

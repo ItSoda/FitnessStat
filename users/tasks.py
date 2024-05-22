@@ -14,7 +14,7 @@ def send_email_success_register(name: str, email: str) -> None:
     """Отправка почты после успешной регистрации"""
 
     # Данные для отправки
-    subjects = f"Успешная регистрация в фитнес-клубе FitnessStat"
+    subjects = "Успешная регистрация в FitnessStat"
     message = (
         f"Уважаемый {name}! Поздравляем с успешной регистрацией в сервисе FitnessStat"
     )
