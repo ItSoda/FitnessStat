@@ -24,7 +24,7 @@ urlpatterns = [
         name="check-email-verify",
     ),
     path(
-        "statistics/get-all-statistics/",
+        "statistics/get-statistics/<str:login>/",
         views.UserStatisticsInfoAPIView.as_view(),
         name="get-all-statistics",
     ),

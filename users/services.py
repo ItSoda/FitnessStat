@@ -8,7 +8,7 @@ import random
 from datetime import timedelta
 from django.core.mail import send_mail
 
-from users.models import User, UserStatistic
+from users.models import BodyVolume, ExternalIndicator, PhysicalIndicator, User
 
 logger_error = logging.getLogger("error")
 
@@ -98,7 +98,23 @@ def proccess_email_verification(code: int, email: str) -> list:
     except Exception as e:
         logger_error.error(f"Ошибка подтверждения почты у пользователя: {str(e)}")
         return False, user
+    
 
+def get_user_by_login(login: str) -> User:
+    """Получение пользователя с помощью  логина"""
 
-def get_user_statistics_by_user(user: User) -> UserStatistic:
-    """Получение статистики пользователя с помощью пользователя"""
+    user = User.objects.filter(login=login).first()
+
+    return user
+
+def get_statistics_by_filter(user: User, statistics_filter: str) -> list:
+    """Получение статистики с помощью фильтра"""
+
+    if statistics_filter == "external_indicator":
+        return ExternalIndicator.objects.filter(user=user) # Получение внешних показателей
+
+    if statistics_filter == "physical_indicator":
+        return PhysicalIndicator.objects.filter(user=user) # Получение физических показателей
+
+    if statistics_filter == "body_volume":
+        return BodyVolume.objects.filter(user=user) # Получение обьемов тела

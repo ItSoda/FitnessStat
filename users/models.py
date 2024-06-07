@@ -54,13 +54,13 @@ class User(AbstractUser):
 class BodyVolume(models.Model):
     """Модель для обьема тела"""
 
-    user_statistics = models.ForeignKey("UserStatistic", on_delete=models.CASCADE)
-    bust = models.PositiveIntegerField(default=0)
-    biceps = models.PositiveIntegerField(default=0)
-    hip = models.PositiveIntegerField(default=0)
-    calf = models.PositiveIntegerField(default=0)
-    waist = models.PositiveIntegerField(default=0)
-    forearm = models.PositiveIntegerField(default=0)
+    user = models.ForeignKey("User", on_delete=models.CASCADE, blank=True, null=True)
+    bust = models.FloatField(default=0)
+    biceps = models.FloatField(default=0)
+    hip = models.FloatField(default=0)
+    calf = models.FloatField(default=0)
+    waist = models.FloatField(default=0)
+    forearm = models.FloatField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -68,14 +68,14 @@ class BodyVolume(models.Model):
         verbose_name_plural = "Обьем тела"
 
     def __str__(self) -> str:
-        return f"Обьем тела для статистики: {self.user_statistics.user.username}"
+        return f"Обьем тела для статистики: {self.user.login}"
 
 
 class PhysicalIndicator(models.Model):
     """Модель для физических показателей"""
 
-    user_statistics = models.ForeignKey("UserStatistic", on_delete=models.CASCADE)
-    weight = models.PositiveIntegerField(default=0)
+    user = models.ForeignKey("User", on_delete=models.CASCADE, blank=True, null=True)
+    weight = models.FloatField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -83,18 +83,18 @@ class PhysicalIndicator(models.Model):
         verbose_name_plural = "Физические показатели"
 
     def __str__(self) -> str:
-        return f"Физические показатели для статистики: {self.user_statistics.user.username}"
+        return f"Физические показатели для статистики: {self.user.login}"
 
 
 class ExternalIndicator(models.Model):
     """Модель для внешних показателей"""
 
-    user_statistics = models.ForeignKey("UserStatistic", on_delete=models.CASCADE)
+    user = models.ForeignKey("User", on_delete=models.CASCADE)
     number_of_steps_per_day = models.PositiveBigIntegerField(default=0)
-    amount_of_KCAL_per_day = models.PositiveIntegerField(default=0)
-    proteins = models.PositiveIntegerField(default=0)
-    fats = models.PositiveIntegerField(default=0)
-    carbohydrates = models.PositiveIntegerField(default=0)
+    amount_of_KCAL_per_day = models.FloatField(default=0)
+    proteins = models.FloatField(default=0)
+    fats = models.FloatField(default=0)
+    carbohydrates = models.FloatField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -103,25 +103,8 @@ class ExternalIndicator(models.Model):
 
     def __str__(self) -> str:
         return (
-            f"Внешние показатели для статистики: {self.user_statistics.user.username}"
+            f"Внешние показатели для статистики: {self.user.login}"
         )
-
-
-class UserStatistic(models.Model):
-    """Модель для статистики пользователя"""
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    body_volumes = models.ManyToManyField(BodyVolume)
-    physical_indicators = models.ManyToManyField(PhysicalIndicator)
-    external_indicators = models.ManyToManyField(ExternalIndicator)
-
-    class Meta:
-        verbose_name = "статистику пользователя"
-        verbose_name_plural = "Статистика пользователя"
-
-    def __str__(self) -> str:
-        return f"Статистика пользователя: {self.user.username}"
-
 
 class PhoneNumberVerifySMS(models.Model):
     """Модель для смс-кодов"""

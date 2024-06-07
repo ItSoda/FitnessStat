@@ -4,24 +4,25 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView
 from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
 from django_ratelimit.decorators import ratelimit
 
 from users.models import User
 from users.services import (
-    get_user_statistics_by_user,
+    get_statistics_by_filter,
+    get_user_by_login,
     proccess_email_verification,
     proccess_phone_verification,
     send_phone_verify_task,
 )
 
 from .serializers import (
+    BodyVolumeSerializer,
+    ExternalIndicatorSerializer,
+    PhysicalIndicatorSerializer,
     UserProfileSerializer,
     UserProfileUpdateSerializer,
-    UserShortSerializer,
-    UserStatisticSerializer,
 )
 
 logger_error = logging.getLogger("error")
@@ -231,14 +232,25 @@ class UserStatisticsInfoAPIView(APIView):
     """Запрос для получения статистики пользователя"""
 
     def get(self, request, *args, **kwargs):
-        user = request.user
         try:
-            user_statistic = get_user_statistics_by_user(user=user)
-            user_statistic_serializer_data = UserStatisticSerializer(
-                user_statistic, context={"request": request}
-            ).data
+            user_login = self.kwargs.get("login") # Получение имени пользователя
+            statistics_filter = self.request.GET.get("statistics")
+            user = get_user_by_login(user_login) # Получение пользователя
+
+            statistics = get_statistics_by_filter(user=user, statistics_filter=statistics_filter) # Получение статистики с помощью фильтра
+            # Сериалиазация списка статистики
+            if statistics_filter == "external_indicator":
+                statistic_serializer = ExternalIndicatorSerializer(statistics, many=True, context={"request": request}).data
+            elif statistics_filter == "physical_indicator":
+                statistic_serializer = PhysicalIndicatorSerializer(statistics, many=True, context={"request": request}).data
+            elif statistics_filter == "body_volume":
+                statistic_serializer = BodyVolumeSerializer(statistics, many=True, context={"request": request}).data
+            else:
+                return Response([], status=status.HTTP_200_OK)
+
+
             return Response(
-                user_statistic_serializer_data, status=status.HTTP_200_OK
+                statistic_serializer, status=status.HTTP_200_OK
             )
         except Exception as e:
             logger_error.error(f"Ошибка вывода статистики пользователя: {str(e)}")
@@ -246,3 +258,5 @@ class UserStatisticsInfoAPIView(APIView):
                 {"error": "Не получилось вывести статистику пользователя."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+

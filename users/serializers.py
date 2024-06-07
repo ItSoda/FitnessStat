@@ -12,7 +12,6 @@ from .models import (
     ExternalIndicator,
     PhysicalIndicator,
     User,
-    UserStatistic,
 )
 
 logger = logging.getLogger("main")
@@ -141,15 +140,3 @@ class BodyVolumeSerializer(serializers.ModelSerializer):
             "forearm",
             "created_at",
         )
-
-
-class UserStatisticSerializer(serializers.ModelSerializer):
-    """Сериалиазатор для статистики пользователя"""
-
-    body_volumes = BodyVolumeSerializer(many=True)
-    physical_indicators = PhysicalIndicatorSerializer(many=True)
-    external_indicators = ExternalIndicatorSerializer(many=True)
-
-    class Meta:
-        model = UserStatistic
-        fields = ("id", "body_volumes", "physical_indicators", "external_indicators")

@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group
 from tinymce.widgets import TinyMCE
 
 from posts.models import ImagePost, Post
-from users.models import User, EmailVerifications, PhoneNumberVerifySMS
+from users.models import User, EmailVerifications, PhoneNumberVerifySMS, BodyVolume, PhysicalIndicator, ExternalIndicator
 
 
 class CustomAdminSite(admin.AdminSite):
@@ -21,6 +21,27 @@ custom_admin_site = CustomAdminSite(name="admin_panel")
 class EmailVerificationsCustomAdmin(admin.TabularInline):
     model = EmailVerifications
     fields = ("code", "expiration")
+    extra = 0
+
+
+class BodyVolumeCustomAdmin(admin.TabularInline):
+    model = BodyVolume
+    fields = ("bust", "biceps", "hip", "calf", "waist", "forearm", "created_at")
+    readonly_fields = ("created_at",)
+    extra = 0
+
+
+class PhysicalIndicatorCustomAdmin(admin.TabularInline):
+    model = PhysicalIndicator
+    fields = ("weight", "created_at")
+    readonly_fields = ("created_at",)
+    extra = 0
+
+
+class ExternalIndicatorCustomAdmin(admin.TabularInline):
+    model = ExternalIndicator
+    fields = ("number_of_steps_per_day", "amount_of_KCAL_per_day", "proteins", "fats", "carbohydrates", "created_at")
+    readonly_fields = ("created_at",)
     extra = 0
 
 
@@ -55,7 +76,7 @@ class UserCustomAdmin(admin.ModelAdmin):
     )
     filter_horizontal = ("groups",)
     search_fields = ["phone_number", "email", "name"]
-    inlines = [EmailVerificationsCustomAdmin]
+    inlines = [EmailVerificationsCustomAdmin, BodyVolumeCustomAdmin, PhysicalIndicatorCustomAdmin, ExternalIndicatorCustomAdmin]
 
 
 class ImagePostCustomAdmin(admin.ModelAdmin):
