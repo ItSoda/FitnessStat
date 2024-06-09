@@ -197,6 +197,19 @@ CACHES = {
     }
 }
 
+# Websockets
+ASGI_APPLICATION = "blackkk.asgi.application"
+
+# channel
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(REDIS_HOST, "6379")],
+        },
+    },
+}
+
 # DRF
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (

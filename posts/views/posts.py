@@ -6,6 +6,7 @@ import logging
 from posts.models import Post
 from posts.pagination.posts import PostPagination
 from posts.serializers.posts import PostSerializer
+from users.models import User
 
 
 logger_error = logging.getLogger("error")
@@ -24,10 +25,15 @@ class PostAllAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         try:
-            posts = Post.objects.order_by("-created_at")
-
-            # Пагинация постов
-            posts_with_pagination = self.paginate_queryset(posts)
+            post_type = self.request.GET.get("post_type")
+            if post_type is None:
+                posts = Post.objects.order_by("-created_at") # Получение всех постов
+            if post_type == "coach":
+                posts = Post.objects.filter(creator__role=User.COACH).order_by("-created_at") # Получение всех постов тренеров
+            if post_type == "client":
+                posts = Post.objects.filter(creator__role=User.CLIENT).order_by("-created_at") # Получение всех постов клиентов
+                
+            posts_with_pagination = self.paginate_queryset(posts) # Пагинация постов
 
             # Получение постов в json формате
             posts_serializer_data = PostSerializer(
